@@ -5,12 +5,43 @@ library(tidyverse)
 # Assign bearer token to a character object
 bearer_token <- Sys.getenv("TWITTER_ACADEMIC_BEARER")
 
-# Pull Tweets
-tweets1 <- get_all_tweets(query = "anti-trans OR anti-transgender OR (trans sports) OR (trans ban)", 
+# Build query
+trans_query <- build_query(
+  query = "anti-trans OR anti-transgender OR (trans sports) OR (trans ban)",
+  is_retweet = FALSE,
+  lang = "en"
+)
+
+# Pull tweets - March 11th - April 10th 
+tweets1 <- get_all_tweets(query = trans_query, 
                           start_tweets = "2021-03-11T00:00:00Z", # start date 
-                          end_tweets = "2021-06-17T00:00:00Z", # end date
+                          end_tweets = "2021-04-10T23:59:59Z", # end date
                           bearer_token = bearer_token, # bearer token to access Twitter API 
-                          file = "trans_sports_ban" # name of the resulting RDS file
+                          file = "trans_sports_ban0" # name of the resulting RDS file
+)
+
+# Pull tweets - April 11th - May 10th 
+tweets1 <- get_all_tweets(query = trans_query, 
+                          start_tweets = "2021-04-11T00:00:00Z", # start date 
+                          end_tweets = "2021-05-10T23:59:59Z", # end date
+                          bearer_token = bearer_token, # bearer token to access Twitter API 
+                          file = "trans_sports_ban1" # name of the resulting RDS file
+)
+
+# Pull tweets - May 11th - June 10th
+tweets1 <- get_all_tweets(query = trans_query, 
+                          start_tweets = "2021-05-11T00:00:00Z", # start date 
+                          end_tweets = "2021-06-10T23:59:59Z", # end date
+                          bearer_token = bearer_token, # bearer token to access Twitter API 
+                          file = "trans_sports_ban2" # name of the resulting RDS file
+)
+
+# Pull tweets - June 11th - June 22nd
+tweets1 <- get_all_tweets(query = trans_query, 
+                          start_tweets = "2021-06-11T00:00:00Z", # start date 
+                          end_tweets = "2021-06-22T00:00:00Z", # end date
+                          bearer_token = bearer_token, # bearer token to access Twitter API 
+                          file = "trans_sports_ban3" # name of the resulting RDS file
 )
 
 ## You will see a warning, don't worry! It is just warning us about data loss when we work with large amounts of 
