@@ -28,8 +28,9 @@ table(trans_sports_full$lang)
 
 # Select relevant columns
 trans_sports_full1 <- trans_sports_full %>%
+  mutate(index = row_number()) %>%
   mutate(text_original = text) %>%
-  select(author_id, created_at, text, everything()) %>%
+  select(index, author_id, created_at, text, everything()) %>%
   mutate(created_at = ymd_hms(created_at)) %>%
   # Remove Korean words
   filter(author_id != trans_sports_full[22488, ]$author_id) %>%
@@ -51,7 +52,7 @@ trans_sports_full1 <- trans_sports_full %>%
   # Reduce to word stem
   mutate(word = wordStem(word, language = "en")) %>%
   # Move main variables to the front
-  select(author_id, created_at, word, everything())
+  select(index, author_id, created_at, word, everything())
 trans_sports_full1
 
 # Save to file
