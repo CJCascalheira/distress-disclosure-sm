@@ -13,7 +13,7 @@ trans_query <- build_query(
 )
 
 # Pull tweets - March 11th - April 10th 
-tweets1 <- get_all_tweets(query = trans_query, 
+tweets0 <- get_all_tweets(query = trans_query, 
                           start_tweets = "2021-03-11T00:00:00Z", # start date 
                           end_tweets = "2021-04-10T23:59:59Z", # end date
                           bearer_token = bearer_token, # bearer token to access Twitter API 
@@ -29,7 +29,7 @@ tweets1 <- get_all_tweets(query = trans_query,
 )
 
 # Pull tweets - May 11th - June 10th
-tweets1 <- get_all_tweets(query = trans_query, 
+tweets2 <- get_all_tweets(query = trans_query, 
                           start_tweets = "2021-05-11T00:00:00Z", # start date 
                           end_tweets = "2021-06-10T23:59:59Z", # end date
                           bearer_token = bearer_token, # bearer token to access Twitter API 
@@ -37,7 +37,7 @@ tweets1 <- get_all_tweets(query = trans_query,
 )
 
 # Pull tweets - June 11th - June 22nd
-tweets1 <- get_all_tweets(query = trans_query, 
+tweets3 <- get_all_tweets(query = trans_query, 
                           start_tweets = "2021-06-11T00:00:00Z", # start date 
                           end_tweets = "2021-06-22T00:00:00Z", # end date
                           bearer_token = bearer_token, # bearer token to access Twitter API 
