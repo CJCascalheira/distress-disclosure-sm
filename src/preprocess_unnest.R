@@ -31,13 +31,22 @@ trans_sports_full1 <- trans_sports_full %>%
   mutate(created_at = ymd_hms(created_at)) %>%
   # Remove Korean words
   filter(author_id != trans_sports_full[22488, ]$author_id) %>%
+  # Remove white space and URLS
+  mutate(
+    text = str_replace_all(text, "\n", " "),
+    text = str_replace_all(text, "(^|[:space:])(www|http)(.*?)($|[:space:])", " "),
+    text = str_replace_all(text, "[:space:]{2,}", " ")
+  ) %>%
+  # Remove punctuation
+  mutate(text = str_replace_all(text, "[[:punct:]]", "")) %>%
+  mutate(text = str_replace_all(text, "[0-9]+", "")) %>%
+  # Remove odd characters
+  mutate(text = str_replace_all(text, "[\\W+]", "")) %>%
   unnest_tokens(word, text) %>%
   select(author_id, created_at, word, everything()) %>%
   # Remove stop words
   anti_join(stop_words) %>%
   anti_join(custom_stop_words) %>%
   # Reduce to word stem
-  mutate(word = wordStem(word, language = "en")) %>%
-  mutate(word = str_replace_all(word, "[[:punct:]]", "")) %>%
-  mutate(word = str_replace_all(word, "[0-9]+", ""))
+  mutate(word = wordStem(word, language = "en"))
 trans_sports_full1
