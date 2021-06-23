@@ -8,14 +8,14 @@ library(tidytext)
 library(SnowballC)
 
 # Import data
-trans_sports_full <- readRDS("data/trans_sports_full.rds")
+trans_sports_wide <- readRDS("data/trans_sports_clean_tweets.rds")
 
 # Load stop words
 data(stop_words)
 
 # Keep personal pronoun to use "i" for personal distress
 stop_words1 <- stop_words %>%
-  filter(!word == "i")
+  filter(!word %in% c("i", "am"))
 
 # Load sentiment library
 afinn <- get_sentiments(lexicon = "afinn") 
@@ -23,29 +23,8 @@ afinn
 
 # CLEAN DATA --------------------------------------------------------------
 
-# Prepare data
-trans_sports_full1 <- trans_sports_full %>%
-  mutate(index = row_number()) %>%
-  mutate(text_original = text) %>%
-  select(index, author_id, created_at, text, everything()) %>%
-  mutate(created_at = ymd_hms(created_at)) %>%
-  # Remove Korean words
-  filter(author_id != trans_sports_full[22488, ]$author_id) %>%
-  # Remove white space and URLS
-  mutate(
-    text = str_replace_all(text, "\n", " "),
-    text = str_replace_all(text, "(^|[:space:])(www|http)(.*?)($|[:space:])", " "),
-    text = str_replace_all(text, "[:space:]{2,}", " ")
-  ) %>%
-  # Remove punctuation
-  mutate(text = str_replace_all(text, "[[:punct:]]", " ")) %>%
-  mutate(text = str_replace_all(text, "[0-9]+", " ")) %>%
-  # Remove odd characters
-  mutate(text = str_replace_all(text, "[\\W+]", " "))
-trans_sports_full1
-
 # Bigrams
-trans_bigrams <- trans_sports_full1 %>%
+trans_bigrams <- trans_sports_wide %>%
   unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
   separate(bigram, c("word1", "word2"), sep = " ") %>%
   # Remove stop words
@@ -58,7 +37,7 @@ trans_bigrams <- trans_sports_full1 %>%
 head(trans_bigrams)
 
 # Trigrams
-trans_trigrams <- trans_sports_full1 %>%
+trans_trigrams <- trans_sports_wide %>%
   unnest_tokens(trigram, text, token = "ngrams", n = 3) %>%
   separate(trigram, c("word1", "word2", "word3"), sep = " ") %>%
   # Remove stop words
@@ -122,3 +101,19 @@ View(trigrams_sentiment)
 
 # At least one notable trigram with decent count
 # i feel bad
+
+# Trigrams starting with I - personal distress
+trigrams_i_am <- trans_trigrams %>% 
+  filter(word1 == "i", word2 == "am") %>%
+  add_count(word1, word2, word3, sort = TRUE) %>%
+  # Select columns to analyze
+  select(index, created_at, word1, word2, word3, n) %>%
+  # Detect negative sentiment
+  left_join(afinn, by = c("word3" = "word")) %>%
+  # Numerous trigrams first
+  arrange(desc(n)) %>%
+  # Use next line just for detection; will need to remove if assigning features
+  distinct(word1, word2, word3, .keep_all = TRUE)
+
+# Manual view of possible trigrams indicating distress
+View(trigrams_i_am)

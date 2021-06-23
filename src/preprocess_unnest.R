@@ -83,9 +83,7 @@ trans_sports_tidy
 
 # Prepare file for LIWC
 trans_sports_liwc <- trans_sports_full1 %>%
-  select(source:geo) %>%
-  select(-referenced_tweets, -context_annotations, -attachments, -geo) %>%
-  select(source:id, conversation_id:in_reply_to_user_id)
+  select(index:text, id, conversation_id:lang, in_reply_to_user_id, text_original)
 trans_sports_liwc 
 
 # EXPORT FILES ------------------------------------------------------------
