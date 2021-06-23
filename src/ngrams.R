@@ -74,7 +74,38 @@ bigrams_sentiment <- trans_bigrams %>%
 # Manual view of possible bigrams indicating distress
 View(bigrams_sentiment)
 
-# Good bigrams working coding into features
+# Good bigrams for coding into features
+distress_bigrams <- trans_bigrams %>% 
+  # Only words starting with I
+  filter(word1 == "i") %>%
+  # Remove "am"
+  filter(word2 != "am") %>%
+  # Add count to data set to retain index
+  add_count(word1, word2, sort = TRUE) %>%
+  # Select columns to analyze
+  select(index, created_at, word1, word2, n) %>%
+  # Detect negative sentiment
+  left_join(afinn, by = c("word2" = "word")) %>%
+  filter(
+    # Keep bigrams with n > 0
+    n > 0,
+    # Keep negative sentiment
+    value < 0
+  ) %>%
+  # Create new column
+  mutate(distress_bigrams = rep(1, nrow(.))) %>%
+  rename(bigram_word1 = word1, bigram_word2 = word2) %>%
+  select(index, starts_with("bigram"), ends_with("bigrams"))
+distress_bigrams
+
+# Merge data for distress bigrams
+trans_sports_wide1 <- trans_sports_wide %>%
+  left_join(distress_bigrams) %>%
+  # Replace missing values with zero
+  mutate(
+    distress_bigrams = if_else(is.na(distress_bigrams), 0, distress_bigrams)
+  )
+trans_sports_wide1
 
 # ANALYZE TRIGRAMS --------------------------------------------------------
 
