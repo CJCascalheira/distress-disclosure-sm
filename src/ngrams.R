@@ -15,7 +15,7 @@ data(stop_words)
 
 # Keep personal pronoun to use "i" for personal distress
 stop_words1 <- stop_words %>%
-  filter(!word %in% c("i", "am"))
+  filter(!word %in% c("i", "am", "me"))
 
 # Load sentiment library
 afinn <- get_sentiments(lexicon = "afinn") 
@@ -182,6 +182,20 @@ trans_sports_wide2 <- trans_sports_wide1 %>%
     distress_trigrams_feel = if_else(is.na(distress_trigrams_feel), 0, distress_trigrams_feel)
   )
 trans_sports_wide2
+
+# Trigrams ending in "me"
+trans_trigrams %>% 
+  filter(word3 == "me") %>%
+  filter(word1 != "ct") %>%
+  filter(word2 != "ks") %>%
+  add_count(word1, word2, word3, sort = TRUE) %>%
+  # Select columns to analyze
+  select(index, created_at, word1, word2, word3, n) %>%
+  # Detect negative sentiment
+  left_join(afinn, by = c("word2" = "word")) %>%
+  left_join(afinn, by = c("word1" = "word")) %>%
+  arrange(value.x) %>%
+  View()
 
 # EXPORT DATASET WITH NEW FEATURES ----------------------------------------
 
