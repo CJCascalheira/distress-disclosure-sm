@@ -116,6 +116,8 @@ trans_trigrams %>%
 # Trigrams starting with I - personal distress
 trigrams_sentiment <- trans_trigrams %>% 
   filter(word1 == "i") %>%
+  # Remove the word "am"
+  filter(word2 != "am") %>%
   add_count(word1, word2, word3, sort = TRUE) %>%
   # Select columns to analyze
   select(index, created_at, word1, word2, word3, n) %>%
@@ -130,10 +132,7 @@ trigrams_sentiment <- trans_trigrams %>%
 # Manual view of possible trigrams indicating distress
 View(trigrams_sentiment)
 
-# At least one notable trigram with decent count
-# i feel bad
-
-# Trigrams starting with I - personal distress
+# Trigrams starting with I am - personal distress
 trigrams_i_am <- trans_trigrams %>% 
   filter(word1 == "i", word2 == "am") %>%
   add_count(word1, word2, word3, sort = TRUE) %>%
@@ -141,10 +140,50 @@ trigrams_i_am <- trans_trigrams %>%
   select(index, created_at, word1, word2, word3, n) %>%
   # Detect negative sentiment
   left_join(afinn, by = c("word3" = "word")) %>%
-  # Numerous trigrams first
-  arrange(desc(n)) %>%
-  # Use next line just for detection; will need to remove if assigning features
-  distinct(word1, word2, word3, .keep_all = TRUE)
+  filter(
+    # Keep bigrams with n > 0
+    n > 0,
+    # Keep negative sentiment
+    value < 0
+  ) %>%
+  # Create new column
+  mutate(distress_trigrams_am = rep(1, nrow(.))) %>%
+  rename(trigram_am1 = word1, trigram_am2 = word2, trigram_am3 = word3) %>%
+  select(index, starts_with("trigram"), ends_with("_am"))
+trigrams_i_am 
 
-# Manual view of possible trigrams indicating distress
-View(trigrams_i_am)
+# Trigrams starting with I feel - personal distress
+trigrams_i_feel <- trans_trigrams %>% 
+  filter(word1 == "i", word2 == "feel") %>%
+  add_count(word1, word2, word3, sort = TRUE) %>%
+  # Select columns to analyze
+  select(index, created_at, word1, word2, word3, n) %>%
+  # Detect negative sentiment
+  left_join(afinn, by = c("word3" = "word")) %>%
+    filter(
+      # Keep bigrams with n > 0
+      n > 0,
+      # Keep negative sentiment
+      value < 0
+    ) %>%
+  # Create new column
+  mutate(distress_trigrams_feel = rep(1, nrow(.))) %>%
+  rename(trigram_feel1 = word1, trigram_feel2 = word2, trigram_feel3 = word3) %>%
+  select(index, starts_with("trigram"), ends_with("_feel")) 
+trigrams_i_feel
+
+# Merge the datasets
+trans_sports_wide2 <- trans_sports_wide1 %>%
+  left_join(trigrams_i_am) %>%
+  left_join(trigrams_i_feel) %>%
+  # Replace missing values with zero
+  mutate(
+    distress_trigrams_am = if_else(is.na(distress_trigrams_am), 0, distress_trigrams_am),
+    distress_trigrams_feel = if_else(is.na(distress_trigrams_feel), 0, distress_trigrams_feel)
+  )
+trans_sports_wide2
+
+# EXPORT DATASET WITH NEW FEATURES ----------------------------------------
+
+# Save as RDS
+saveRDS(trans_sports_wide2, file = "data/features/trans_features_ngrams.rds")

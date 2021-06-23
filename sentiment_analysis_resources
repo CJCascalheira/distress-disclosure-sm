@@ -1,0 +1,13 @@
+Hello, some of you are planning to use sentiment analysis for your project. Here is an article that discusses four different packages for sentiment analysis in R: syuzhet; Rsentiment; SentimentR; SentimentAnalysis: https://arxiv.org/pdf/1901.08319.pdf. The four packages differ greatly for the choice of dictionaries and functions they employ to compute sentiment. In addition to these, quanteda also has some built-in dictionaries for sentiment analysis.
+
+syuzhet – dictionaries: “syuzhet”, “bing”, “afinn”, “nrc”, and “stanford”,  https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html
+
+Rsentiment – uses Parts of Speech (PoS) tagging, classifies sentences into 6 categories: Positive, Negative, Very Positive, Very Negative Sarcasm and Neutral, https://cran.r-project.org/web/packages/RSentiment/RSentiment.pdf
+
+SentimentR - adopts a dictionary lookup approach, tries to incorporate weighting for valence shifters, https://github.com/trinker/sentimentr
+
+SentimentAnalysis – dictionaries: “Harvard-IV dictionary”, “Henry’s Financial dictionary”, “Loughran-McDonald Financial dictionary”, “QDAP dictionary”, https://cran.r-project.org/web/packages/SentimentAnalysis/vignettes/SentimentAnalysis.html
+
+Quanteda – dictionaries: “wordstat”, “LIWC”, “yoshikoder”, “lexicoder”, “YAML”, https://tutorials.quanteda.io/advanced-operations/targeted-dictionary-analysis/
+
+Chris Bail, I think, uses tidytext -- the sentiment dictionaries that are built into tidytext: “bing”, “afinn”, “loughran”, “nrc”, https://cbail.github.io/textasdata/dictionary-methods/rmarkdown/Dictionary-Based_Text_Analysis.html#sentiment-analysis
