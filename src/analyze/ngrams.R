@@ -9,6 +9,7 @@ library(SnowballC)
 
 # Import data
 trans_sports_wide <- readRDS("data/trans_sports_clean_tweets.rds")
+nrow(trans_sports_wide)
 
 # Load stop words
 data(stop_words)
@@ -104,7 +105,8 @@ trans_sports_wide1 <- trans_sports_wide %>%
   # Replace missing values with zero
   mutate(
     distress_bigrams = if_else(is.na(distress_bigrams), 0, distress_bigrams)
-  )
+  ) %>%
+  distinct(index, .keep_all = TRUE)
 trans_sports_wide1
 
 # ANALYZE TRIGRAMS --------------------------------------------------------
@@ -180,7 +182,8 @@ trans_sports_wide2 <- trans_sports_wide1 %>%
   mutate(
     distress_trigrams_am = if_else(is.na(distress_trigrams_am), 0, distress_trigrams_am),
     distress_trigrams_feel = if_else(is.na(distress_trigrams_feel), 0, distress_trigrams_feel)
-  )
+  ) %>%
+  distinct(index, .keep_all = TRUE)
 trans_sports_wide2
 
 # Trigrams ending in "me"
@@ -198,6 +201,9 @@ trans_trigrams %>%
   View()
 
 # EXPORT DATASET WITH NEW FEATURES ----------------------------------------
+
+# Double check row numbers
+nrow(trans_sports_wide2)
 
 # Save as RDS
 saveRDS(trans_sports_wide2, file = "data/features/trans_features_ngrams.rds")

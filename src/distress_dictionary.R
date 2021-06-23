@@ -2,17 +2,19 @@
 library(tidyverse)
 library(tidytext)
 library(SnowballC)
+library(lubridate)
 
 # Import data
-trans_sports_full <- readRDS("data/trans_sports_full.rds")
+trans_sports_full <- readRDS("data/trans_sports_clean_words.rds")
 
 # Load stop words
 data(stop_words)
 
 # Select relevant columns
 trans_sports_full1 <- trans_sports_full %>%
-  select(author_id, created_at, text) %>%
+  select(index, created_at, word) %>%
   mutate(created_at = ymd_hms(created_at))
+trans_sports_full1
 
 # Distress dictionary
 search_dictionary <- c('tired', 'fatigued', 'fatigue', 'exhausted', 'exhaustion', 'nervous',
@@ -29,15 +31,17 @@ search_dictionary <- c('tired', 'fatigued', 'fatigue', 'exhausted', 'exhaustion'
 
 # Word stems of distress dictionary
 search_dictionary <- wordStem(search_dictionary, language = "en")
+search_dictionary
 
-# Pre-process dataset
-trans_sports_tokens <- unnest_tokens(trans_sports_full1, token, text) %>%
-  # Remove stop words
-  anti_join(stop_words, by = c("token" = "word")) 
-trans_sports_tokens
+# FILTER WITH DICTIONARY AND SAVE FILE ------------------------------------
 
 # Apply filter
-trans_sports_tokens %>%
+distress_dictionary <- trans_sports_full1 %>%
   # Just the stop words
-  mutate(token = wordStem(token, language = "en")) %>%
-  filter(token %in% search_dictionary)
+  filter(word %in% search_dictionary) %>%
+  mutate(distress_dictionary = rep(1, nrow(.))) %>%
+  select(index, distress_dictionary)
+distress_dictionary
+
+# Save to file
+write_csv(distress_dictionary, "data/features/trans_features_distress_dictionary.csv")
