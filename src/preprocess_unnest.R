@@ -11,6 +11,10 @@ trans_sports_full <- readRDS("data/trans_sports_full.rds")
 # Load stop words
 data(stop_words)
 
+# Keep personal pronoun to use "i" for personal distress
+stop_words1 <- stop_words %>%
+  filter(!word == "i")
+
 # Custom stop words
 custom_stop_words <- tribble(
   ~word, ~lexicon,
