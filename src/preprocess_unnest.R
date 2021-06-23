@@ -9,14 +9,6 @@ library(qdap)
 # Import data
 trans_sports_full <- readRDS("data/trans_sports_full.rds")
 
-# Export to file for LIWC
-trans_sports_liwc <- trans_sports_full %>%
-  select(source:geo) %>%
-  select(-referenced_tweets, -context_annotations, -attachments, -geo) %>%
-  select(source:id, conversation_id:in_reply_to_user_id)
-trans_sports_liwc 
-write_csv(trans_sports_liwc, "data/trans_sports_liwc.csv")
-
 # Load stop words
 data(stop_words)
 
@@ -38,6 +30,8 @@ custom_stop_words
 
 # Language in this dataset?
 table(trans_sports_full$lang)
+
+# PRE-PROCESS -------------------------------------------------------------
 
 # Pre-process text
 trans_sports_full1 <- trans_sports_full %>%
@@ -87,6 +81,18 @@ trans_sports_tidy <- trans_sports_full1 %>%
   select(index, author_id, created_at, word, everything())
 trans_sports_tidy
 
+# Prepare file for LIWC
+trans_sports_liwc <- trans_sports_full1 %>%
+  select(source:geo) %>%
+  select(-referenced_tweets, -context_annotations, -attachments, -geo) %>%
+  select(source:id, conversation_id:in_reply_to_user_id)
+trans_sports_liwc 
+
+# EXPORT FILES ------------------------------------------------------------
+
 # Save to file
 saveRDS(trans_sports_full1, file = "data/trans_sports_clean_tweets.rds")
 saveRDS(trans_sports_tidy, file = "data/trans_sports_clean_words.rds")
+
+# Export to file for LIWC
+write_csv(trans_sports_liwc, "data/trans_sports_liwc.csv")
