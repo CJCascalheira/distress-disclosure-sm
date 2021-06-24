@@ -73,4 +73,4 @@ trans_distress_3 <- trans_clean_final %>%
 trans_distress_3
 
 # Save second version
-write_rds(trans_distress_3, file = "data/distress_tweets/trans_distress_v3.rds")
+# write_rds(trans_distress_3, file = "data/distress_tweets/trans_distress_v3.rds")
