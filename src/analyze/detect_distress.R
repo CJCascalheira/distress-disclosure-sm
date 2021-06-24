@@ -16,7 +16,7 @@ trans_clean_final <- trans_clean_final1 %>%
 
 # DETECT DISTRESS DISCLOSURE ----------------------------------------------
 
-# Detect distress based on features
+# Detect distress - version I
 trans_distress_1 <- trans_clean_final %>%
   filter(
     distress_bigrams == 1 |
@@ -32,7 +32,7 @@ trans_distress_1 %>%
 # Save first version
 # write_rds(trans_distress_1, file = "data/distress_tweets/trans_distress_v1.rds")
 
-# Detect distress
+# Detect distress - version II
 trans_distress_2 <- trans_clean_final %>%
   # Higher numbers are associated with more honest, personal, disclosing text
   filter(Authentic > 50) %>%
@@ -55,3 +55,22 @@ trans_distress_2 %>%
   discard(is.list) #%>%
   # Write to file, then manually code
   #write_csv(file = "data/distress_tweets/trans_distress_v2.csv")
+
+# Detect distress - version III
+trans_distress_3 <- trans_clean_final %>%
+  # Only personal pronouns
+  filter(i != 0) %>%
+  # More negative emotion words
+  mutate(neg_is_greater = abs(negemo) > abs(posemo)) %>%
+  # Tweet has more negative emotion words than positive 
+  filter(neg_is_greater == TRUE) %>%
+  filter(
+    distress_bigrams == 1 |
+      distress_trigrams_am == 1 |
+      distress_trigrams_feel == 1 |
+      distress_dictionary == 1
+  )
+trans_distress_3
+
+# Save second version
+write_rds(trans_distress_3, file = "data/distress_tweets/trans_distress_v3.rds")
