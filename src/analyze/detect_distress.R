@@ -47,4 +47,11 @@ trans_distress_2 <- trans_clean_final %>%
 View(trans_distress_2)
 
 # Save second version
-write_rds(trans_distress_2, file = "data/distress_tweets/trans_distress_v2.rds")
+# write_rds(trans_distress_2, file = "data/distress_tweets/trans_distress_v2.rds")
+
+# Save second version - CSV
+trans_distress_2 %>%
+  # Remove list objects
+  discard(is.list) #%>%
+  # Write to file, then manually code
+  #write_csv(file = "data/distress_tweets/trans_distress_v2.csv")
