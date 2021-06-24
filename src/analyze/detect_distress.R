@@ -17,7 +17,7 @@ trans_clean_final <- trans_clean_final1 %>%
 # DETECT DISTRESS DISCLOSURE ----------------------------------------------
 
 # Detect distress based on features
-trans_distress <- trans_clean_final %>%
+trans_distress_1 <- trans_clean_final %>%
   filter(
     distress_bigrams == 1 |
       distress_trigrams_am == 1 |
@@ -26,8 +26,25 @@ trans_distress <- trans_clean_final %>%
   )
 
 # First version - check work
-trans_distress %>%
+trans_distress_1 %>%
   distinct(index, .keep_all = TRUE)
 
 # Save first version
-write_rds(trans_distress, file = "data/distress_tweets/trans_distress_v1.rds")
+# write_rds(trans_distress_1, file = "data/distress_tweets/trans_distress_v1.rds")
+
+# Detect distress
+trans_distress_2 <- trans_clean_final %>%
+  # Higher numbers are associated with more honest, personal, disclosing text
+  filter(Authentic > 50) %>%
+  # Lower numbers reveals greater anxiety, sadness, or hostility
+  filter(Tone < 50) %>%
+  filter(
+    distress_bigrams == 1 |
+      distress_trigrams_am == 1 |
+      distress_trigrams_feel == 1 |
+      distress_dictionary == 1
+  )
+View(trans_distress_2)
+
+# Save second version
+write_rds(trans_distress_2, file = "data/distress_tweets/trans_distress_v2.rds")
