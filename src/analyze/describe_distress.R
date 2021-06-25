@@ -1,9 +1,19 @@
 # Dependencies
 library(tidyverse)
+library(tidytext)
+library(SnowballC)
+library(viridis)
 
 # Import
 trans_distress_v2 <- read_csv("data/distress_tweets/trans_distress_v2_manual.csv")
 trans_distress_v2
+
+# Get sentiments
+nrc <- get_sentiments("nrc") %>%
+  mutate(word = wordStem(word))
+
+# Load stop words
+data(stop_words)
 
 # Total count
 nrow(trans_distress_v2)
@@ -76,12 +86,40 @@ t.test(distress_no$discrep, distress_yes$discrep)
 t.test(distress_no$certain, distress_yes$certain)
 t.test(distress_no$insight, distress_yes$insight)
 
+# Visual sentiment of distress vs. non-distress
+trans_distress_v2 %>%
+  unnest_tokens(word, text) %>%
+  mutate(word = wordStem(word)) %>%
+  left_join(nrc) %>%
+  select(distress_tweet, sentiment) %>%
+  filter(!is.na(sentiment)) %>%
+  count(distress_tweet, sentiment) %>%
+  mutate(distress_tweet = recode(distress_tweet, `0` = "Non-Distress Tweets", `1` = "Distress Tweets")) %>%
+  ggplot(aes(x = sentiment, y = n, fill = sentiment)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ distress_tweet) +
+  theme_bw() +
+  scale_fill_viridis(discrete = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  labs(
+    y = "",
+    x = ""
+  )
+ 
 # TOP WORDS ---------------------------------------------------------------
 
-top_words %>%
+# Top words by distress vs. non-distress
+trans_distress_v2 %>%
+  unnest_tokens(word, text) %>%
+  mutate(word = wordStem(word)) %>%
+  anti_join(stop_words) %>%
+  count(distress_tweet, word) %>%
+  filter(!(word %in% c("tran", "sport", ""))) %>%
+  arrange(desc(n)) %>%
   slice(1:20) %>%
   ggplot(aes(x=reorder(word, -n), y=n, fill=word))+
   geom_bar(stat="identity")+
+  facet_wrap(~ distress_tweet) +
   theme_minimal()+
   theme(axis.text.x = 
           element_text(angle = 60, hjust = 1, size=13))+
@@ -89,5 +127,4 @@ top_words %>%
           element_text(hjust = 0.5, size=18))+
   ylab("Frequency")+
   xlab("")+
-  ggtitle("Most Frequent Words in anti-trans sports ban Tweets")+  
   guides(fill=FALSE)
